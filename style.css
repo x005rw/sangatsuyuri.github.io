@@ -98,3 +98,54 @@ dl dd {
     margin-left: 20px;
     margin-bottom: 5px;
 }
+
+@media (max-width: 767px) {
+    .hamburger {
+        display: block;
+    }
+
+    .left,
+    .light {
+        display: none;
+        position: fixed;
+        top: 0;
+        height: 100vh;
+        z-index: 999;
+    }
+
+    .left {
+        left: 0;
+    }
+
+    .light {
+        right: 0;
+    }
+
+    .left.show,
+    light.show {
+        display: block;
+    }
+
+    .content {
+        max-width: 100%;
+        margin: 0;
+        padding: 10px;
+    }
+
+    footer {
+        padding: 10px;
+    }
+}
+
+.hamburger {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #ff99cc;
+    border: none;
+    font-size: 24px;
+    padding: 5px 10px;
+    cursor: pointer;
+    z-index: 1000;
+}

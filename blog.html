@@ -9,6 +9,8 @@
 </head>
 
 <body>
+    <button class="hamburger">☰</button>
+
     <div class="container">
         <div class="main-content">
             <aside class="left">
@@ -25,7 +27,8 @@
 
             <aside class="light">
                 <ul>
-                    <li><a href="https://x.com/sangatsuyuri" target="_blank" rel="noopener noreferrer">X(@sangatsuyuri)</a></li>
+                    <li><a href="https://x.com/sangatsuyuri" target="_blank"
+                            rel="noopener noreferrer">X(@sangatsuyuri)</a></li>
                 </ul>
             </aside>
         </div>
@@ -34,6 +37,12 @@
             <p>© 2025 サンガツユリ. All rights reserved.</p>
         </footer>
     </div>
+    <script>
+        document.querySelector('.hamburger').addEventListener('click', () => {
+            document.querySelector('.left').classList.toggle('show');
+            document.querySelector('.light').classList.toggle('show');
+        });
+    </script>
 </body>
 
 </html>
