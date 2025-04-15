@@ -153,3 +153,7 @@ dl dd {
     cursor: pointer;
     z-index: 1000;
 }
+
+.content ul li {
+    margin: 20px;
+}
