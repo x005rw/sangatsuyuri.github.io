@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
+
 <body>
     <div class="layout-container">
         <button class="hamburger-menu" id="hamburgerMenu">
@@ -42,7 +44,8 @@
         <aside class="sidebar right-sidebar">
             <nav class="social-nav">
                 <ul>
-                    <li><a href="https://x.com/sangatsuyuri" target="_blank" title="X"><i class="fa-brands fa-x-twitter"></i></a></li>
+                    <li><a href="https://x.com/sangatsuyuri" target="_blank" title="X"><i
+                                class="fa-brands fa-x-twitter"></i></a></li>
                 </ul>
             </nav>
         </aside>
@@ -71,26 +74,26 @@
         // テーマ切り替え機能
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
-        
+
         // ローカルストレージから保存されたテーマを取得
         const currentTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', currentTheme);
-        
+
         // アイコンの初期状態を設定
         if (currentTheme === 'dark') {
             themeIcon.classList.remove('fa-moon');
             themeIcon.classList.add('fa-sun');
         }
-        
+
         // テーマ切り替えボタンのクリックイベント
         themeToggle.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
+
             // テーマを切り替え
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            
+
             // アイコンを切り替え
             if (newTheme === 'dark') {
                 themeIcon.classList.remove('fa-moon');
@@ -102,4 +105,5 @@
         });
     </script>
 </body>
-</html> 
+
+</html>
