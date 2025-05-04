@@ -1105,4 +1105,45 @@ footer {
 .hamburger-menu i {
     font-size: 1.4rem;
     color: var(--text-color);
+}
+
+/* --- シンプルな編集・削除ボタン --- */
+.edit-btn, .delete-btn {
+    font-size: 1rem;
+    padding: 0.45rem 1.1rem;
+    border: 1.5px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    background: #f5f5f5;
+    color: #333;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
+    box-shadow: none;
+    font-weight: 500;
+}
+
+.edit-btn {
+    border-color: #e0e0e0;
+}
+.edit-btn:hover, .edit-btn:focus {
+    background: #e3f0ff;
+    border-color: #90caf9;
+    color: #1976d2;
+}
+
+.delete-btn {
+    border-color: #e0e0e0;
+    color: #c62828;
+}
+.delete-btn:hover, .delete-btn:focus {
+    background: #ffeaea;
+    border-color: #ef9a9a;
+    color: #b71c1c;
+}
+
+.edit-btn i, .delete-btn i {
+    font-size: 1.1em;
+    margin-right: 0.2em;
 } 

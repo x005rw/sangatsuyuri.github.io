@@ -113,6 +113,10 @@
             }
         ];
 
+        // グローバル変数
+        let editingPostId = null;
+        const blogForm = document.getElementById('blogForm');
+
         // 記事を表示する関数
         function displayPosts() {
             const blogPostsContainer = document.getElementById('blogPosts');
@@ -143,7 +147,18 @@
                             <img src="${post.thumbnail}" alt="${post.title}">
                         </div>
                         <div class="post-preview-content">
-                            <h2 class="post-title">${post.title}</h2>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <h2 class="post-title" style="margin-bottom: 0;">${post.title}</h2>
+                                ${document.getElementById('adminPanel').style.display === 'block' ? 
+                                    `<div>
+                                        <button class="edit-btn" onclick="editPost(${post.id})" title="編集">
+                                            <i class="fas fa-pen-to-square"></i>
+                                        </button>
+                                        <button class="delete-btn" onclick="deletePost(${post.id})" title="削除">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>` : ''}
+                            </div>
                             <div class="post-meta">
                                 <span class="post-date"><i class="far fa-calendar"></i> ${post.date}</span>
                                 <span class="post-tags"><i class="fas fa-tags"></i> ${post.tags.join(', ')}</span>
@@ -154,12 +169,6 @@
                             <a href="#" class="read-more" onclick="viewPost(${post.id})">続きを読む</a>
                         </div>
                     </div>
-                    ${document.getElementById('adminPanel').style.display === 'block' ? 
-                        `<div class="post-actions">
-                            <button class="delete-btn" onclick="deletePost(${post.id})">
-                                <i class="fas fa-trash"></i> 削除
-                            </button>
-                        </div>` : ''}
                 `;
 
                 blogPostsContainer.appendChild(article);
@@ -203,6 +212,20 @@
             }
         }
 
+        // 編集ボタンの処理
+        function editPost(id) {
+            const post = blogPosts.find(p => p.id === id);
+            if (!post) return;
+            document.getElementById('title').value = post.title;
+            document.getElementById('content').value = post.content;
+            document.getElementById('thumbnail').value = post.thumbnail;
+            document.getElementById('tags').value = post.tags.join(', ');
+            editingPostId = id;
+            document.querySelector('.submit-btn').textContent = '更新する';
+            // スクロールしてフォームを表示
+            blogForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const adminPanel = document.getElementById('adminPanel');
             const adminLoginBtn = document.getElementById('adminLoginBtn');
@@ -224,7 +247,6 @@
             });
 
             // ブログ投稿フォームの処理
-            const blogForm = document.getElementById('blogForm');
             blogForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -238,27 +260,34 @@
                     day: 'numeric'
                 });
 
-                // 新しい記事を作成
-                const newPost = {
-                    id: Date.now(), // タイムスタンプをIDとして使用
-                    title,
-                    content,
-                    thumbnail,
-                    date,
-                    tags
-                };
-
-                // 記事を追加
-                blogPosts.unshift(newPost);
-                localStorage.setItem('blogPosts', JSON.stringify(blogPosts));
-                
-                // 表示を更新
-                displayPosts();
-                
-                // フォームをリセット
-                blogForm.reset();
-                
-                alert('投稿が完了しました！');
+                if (editingPostId) {
+                    // 編集モード
+                    const idx = blogPosts.findIndex(p => p.id === editingPostId);
+                    if (idx !== -1) {
+                        blogPosts[idx] = { ...blogPosts[idx], title, content, thumbnail, tags };
+                        localStorage.setItem('blogPosts', JSON.stringify(blogPosts));
+                        displayPosts();
+                        blogForm.reset();
+                        editingPostId = null;
+                        document.querySelector('.submit-btn').textContent = '投稿する';
+                        alert('記事を更新しました！');
+                    }
+                } else {
+                    // 新規投稿
+                    const newPost = {
+                        id: Date.now(),
+                        title,
+                        content,
+                        thumbnail,
+                        date,
+                        tags
+                    };
+                    blogPosts.unshift(newPost);
+                    localStorage.setItem('blogPosts', JSON.stringify(blogPosts));
+                    displayPosts();
+                    blogForm.reset();
+                    alert('投稿が完了しました！');
+                }
             });
         });
 
