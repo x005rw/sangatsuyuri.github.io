@@ -1,1 +1,0 @@
-# sangatsuyuri.github.io
