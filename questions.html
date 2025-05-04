@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>質問募集 - サンガツユリ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="layout-container">
+        <aside class="sidebar left-sidebar">
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> ホーム</a></li>
+                    <li><a href="blog.html"><i class="fas fa-blog"></i> ブログ</a></li>
+                    <li><a href="questions.html"><i class="fas fa-question-circle"></i> 質問募集</a></li>
+                    <li><a href="updates.html"><i class="fas fa-history"></i> 更新履歴</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main>
+            <div class="theme-switch">
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+
+            <section class="questions">
+                <h1><i class="fas fa-question-circle"></i> 質問募集</h1>
+                
+                <!-- 管理者ログインボタン -->
+                <div class="admin-login">
+                    <button id="adminLoginBtn" class="admin-login-btn">
+                        <i class="fas fa-lock"></i> 管理者ログイン
+                    </button>
+                </div>
+                
+                <!-- 質問投稿フォーム -->
+                <div class="question-form-container">
+                    <h2><i class="fas fa-pen"></i> 質問を投稿する</h2>
+                    <form id="questionForm" class="question-form">
+                        <div class="form-group">
+                            <label for="question">質問内容</label>
+                            <textarea id="question" name="question" rows="5" required placeholder="質問内容を入力してください"></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">投稿する</button>
+                    </form>
+                </div>
+
+                <!-- 質問一覧 -->
+                <div class="questions-list" id="questionsList">
+                    <!-- 質問はJavaScriptで動的に追加されます -->
+                </div>
+            </section>
+        </main>
+
+        <aside class="sidebar right-sidebar">
+            <nav class="social-nav">
+                <ul>
+                    <li><a href="https://x.com/sangatsuyuri" target="_blank" title="X"><i class="fa-brands fa-x-twitter"></i></a></li>
+                </ul>
+            </nav>
+        </aside>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 サンガツユリ All rights reserved.</p>
+    </footer>
+
+    <script>
+        // 質問のデータを管理する配列
+        let questions = JSON.parse(localStorage.getItem('questions')) || [];
+
+        // 質問を表示する関数
+        function displayQuestions() {
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '';
+
+            questions.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question-item';
+                questionElement.dataset.id = question.id;
+
+                questionElement.innerHTML = `
+                    <div class="question-content">
+                        <div class="question-meta">
+                            <span class="question-number">質問 #${index + 1}</span>
+                            <span class="question-date"><i class="far fa-calendar"></i> ${question.date}</span>
+                        </div>
+                        <div class="question-text">
+                            ${question.text}
+                        </div>
+                        ${question.answer ? `
+                            <div class="answer">
+                                <div class="answer-header">
+                                    <i class="fas fa-reply"></i> 回答
+                                </div>
+                                <div class="answer-content">
+                                    ${question.answer}
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${document.getElementById('adminLoginBtn').style.display === 'none' ? `
+                            <div class="post-actions">
+                                <button class="delete-btn" onclick="deleteQuestion(${question.id})">
+                                    <i class="fas fa-trash"></i> 質問を削除
+                                </button>
+                                ${question.answer ? `
+                                    <button class="delete-btn" onclick="deleteAnswer(${question.id})">
+                                        <i class="fas fa-trash"></i> 回答を削除
+                                    </button>
+                                ` : ''}
+                                <div class="answer-form">
+                                    <textarea class="answer-input" placeholder="回答を入力してください"></textarea>
+                                    <button class="answer-btn" onclick="submitAnswer(${question.id})">回答する</button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                questionsList.appendChild(questionElement);
+            });
+        }
+
+        // 回答を投稿する関数
+        function submitAnswer(questionId) {
+            const answerInput = document.querySelector(`.question-item[data-id="${questionId}"] .answer-input`);
+            const answer = answerInput.value.trim();
+
+            if (!answer) {
+                alert('回答を入力してください');
+                return;
+            }
+
+            const questionIndex = questions.findIndex(q => q.id === questionId);
+            if (questionIndex !== -1) {
+                questions[questionIndex].answer = answer;
+                localStorage.setItem('questions', JSON.stringify(questions));
+                displayQuestions();
+            }
+        }
+
+        // 質問を削除する関数
+        function deleteQuestion(questionId) {
+            if (confirm('この質問を削除してもよろしいですか？')) {
+                questions = questions.filter(q => q.id !== questionId);
+                localStorage.setItem('questions', JSON.stringify(questions));
+                displayQuestions();
+            }
+        }
+
+        // 回答を削除する関数
+        function deleteAnswer(questionId) {
+            if (confirm('この回答を削除してもよろしいですか？')) {
+                const questionIndex = questions.findIndex(q => q.id === questionId);
+                if (questionIndex !== -1) {
+                    questions[questionIndex].answer = null;
+                    localStorage.setItem('questions', JSON.stringify(questions));
+                    displayQuestions();
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            
+            // 初期表示
+            displayQuestions();
+            
+            // 管理者ログインボタンのクリックイベント
+            adminLoginBtn.addEventListener('click', function() {
+                const password = prompt('管理者パスワードを入力してください:');
+                
+                if (password === 'vmrwxigb8972') { // 管理者パスワード
+                    adminLoginBtn.style.display = 'none';
+                    displayQuestions(); // 管理者モードで再表示
+                } else if (password !== null) {
+                    alert('パスワードが間違っています');
+                }
+            });
+
+            // 質問投稿フォームの処理
+            const questionForm = document.getElementById('questionForm');
+            questionForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const questionText = document.getElementById('question').value;
+                const date = new Date().toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                // 新しい質問を作成
+                const newQuestion = {
+                    id: Date.now(), // タイムスタンプをIDとして使用
+                    text: questionText,
+                    date: date,
+                    answer: null
+                };
+
+                // 質問を追加
+                questions.unshift(newQuestion);
+                localStorage.setItem('questions', JSON.stringify(questions));
+                
+                // 表示を更新
+                displayQuestions();
+                
+                // フォームをリセット
+                questionForm.reset();
+                
+                alert('質問が投稿されました！');
+            });
+        });
+
+        // テーマ切り替え機能
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // ローカルストレージから保存されたテーマを取得
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        // アイコンの初期状態を設定
+        if (currentTheme === 'dark') {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+        
+        // テーマ切り替えボタンのクリックイベント
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            // テーマを切り替え
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // アイコンを切り替え
+            if (newTheme === 'dark') {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+    </script>
+</body>
+</html> 
