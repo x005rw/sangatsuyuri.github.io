@@ -134,6 +134,7 @@
                     return response.json();
                 })
                 .then(data => {
+                    // サーバーから取得した動静を表示
                     document.getElementById('currentStatusDisplay').textContent = `現在の動静: ${data.status}`;
                 })
                 .catch(error => {
