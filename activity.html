@@ -71,10 +71,14 @@
     <script>
         const correctPassword = "vmrwxigb8972";
 
-        // ページ読み込み時に保存された状態を取得して表示
+        // ページ読み込み時にサーバーから動静を取得
         window.onload = () => {
-            const savedStatus = localStorage.getItem('currentStatus') || 'OFF';
-            document.getElementById('currentStatus').textContent = savedStatus;
+            fetch('http://localhost:3000/getStatus')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('currentStatus').textContent = data.status;
+                })
+                .catch(error => console.error('Error:', error));
         };
 
         function login() {
@@ -91,17 +95,36 @@
             const statusElement = document.getElementById('currentStatus');
             statusElement.textContent = status;
 
-            // 状態を localStorage に保存
-            localStorage.setItem('currentStatus', status);
+            // サーバーに動静を保存
+            fetch('http://localhost:3000/saveStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+                alert('動静が更新されました！');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('サーバーとの通信に失敗しました。');
+            });
         }
 
         function setCustomStatus() {
             const customStatus = document.getElementById('customStatusInput').value;
-            if (customStatus.trim() !== "") {
-                setStatus(customStatus);
-            } else {
+            if (customStatus.trim() === "") {
                 alert("自由入力欄が空です。");
+                return;
             }
+            if (customStatus.length > 50) {
+                alert("ステータスは50文字以内で入力してください。");
+                return;
+            }
+            setStatus(customStatus);
         }
     </script>
 </body>
