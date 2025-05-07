@@ -55,6 +55,12 @@
     <script>
         const correctPassword = "vmrwxigb8972";
 
+        // ページ読み込み時に保存された状態を取得して表示
+        window.onload = () => {
+            const savedStatus = localStorage.getItem('currentStatus') || 'OFF';
+            document.getElementById('currentStatus').textContent = savedStatus;
+        };
+
         function login() {
             const passwordInput = document.getElementById('adminPassword').value;
             if (passwordInput === correctPassword) {
@@ -68,6 +74,9 @@
         function setStatus(status) {
             const statusElement = document.getElementById('currentStatus');
             statusElement.textContent = status;
+
+            // 状態を localStorage に保存
+            localStorage.setItem('currentStatus', status);
         }
     </script>
 </body>
