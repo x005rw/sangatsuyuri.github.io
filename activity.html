@@ -74,11 +74,19 @@
         // ページ読み込み時にサーバーから動静を取得
         window.onload = () => {
             fetch('http://localhost:3000/getStatus')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('サーバーエラー');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     document.getElementById('currentStatus').textContent = data.status;
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('サーバーとの通信に失敗しました。');
+                });
         };
 
         function login() {
@@ -103,7 +111,12 @@
                 },
                 body: JSON.stringify({ status }),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('サーバーエラー');
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log(data.message);
                 alert('動静が更新されました！');
