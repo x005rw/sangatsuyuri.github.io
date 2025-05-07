@@ -127,29 +127,15 @@
             const statusElement = document.getElementById('currentStatus');
             statusElement.textContent = status;
 
-            // サーバーに動静を保存
-            fetch('http://localhost:3000/saveStatus', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status }),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`サーバーエラー: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data.message);
+            // Firebase に動静を保存
+            firebase.database().ref('status').set({
+                status: status,
+                timestamp: Date.now()
+            }).then(() => {
                 alert('動静が更新されました！');
-            })
-            .catch(error => {
-                console.error('通信エラー:', error.message);
-                alert('サーバーとの通信に失敗しました。詳細はコンソールを確認してください。');
+            }).catch(error => {
+                console.error('エラー:', error);
+                alert('動静の保存に失敗しました。');
             });
         }
 

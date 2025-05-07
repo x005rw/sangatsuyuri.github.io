@@ -143,6 +143,36 @@
                 });
         };
     </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+
+    <script>
+        // Firebase 初期化
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Firebase から動静を取得
+        firebase.database().ref('status').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('currentStatusDisplay').textContent = `現在の動静: ${data.status}`;
+            } else {
+                document.getElementById('currentStatusDisplay').textContent = `現在の動静: OFF`;
+            }
+        });
+    </script>
 </body>
 
 </html>
