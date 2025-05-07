@@ -37,6 +37,7 @@
             <section class="hero">
                 <div class="hero-content">
                     <h1>サンガツユリ</h1>
+                    <p id="currentStatusDisplay">現在の動静: OFF</p> <!-- 動静を表示する要素 -->
                 </div>
             </section>
 
@@ -114,6 +115,12 @@
                 themeIcon.classList.add('fa-moon');
             }
         });
+
+        // ページ読み込み時に保存された動静を取得して表示
+        window.onload = () => {
+            const savedStatus = localStorage.getItem('currentStatus') || 'OFF';
+            document.getElementById('currentStatusDisplay').textContent = `現在の動静: ${savedStatus}`;
+        };
     </script>
 </body>
 

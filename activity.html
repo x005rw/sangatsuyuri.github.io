@@ -31,6 +31,13 @@
         .hidden {
             display: none;
         }
+
+        .navigation button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -50,6 +57,15 @@
         <button onclick="setStatus('移動中')">移動中</button>
         <button onclick="setStatus('OFF')">OFF</button>
         <button onclick="setStatus('外出中')">外出中</button>
+        <button onclick="setStatus('入浴中')">入浴中</button>
+        <div class="custom-status">
+            <input type="text" id="customStatusInput" placeholder="自由入力">
+            <button onclick="setCustomStatus()">設定</button>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button onclick="location.href='index.html'">ホームに戻る</button>
     </div>
 
     <script>
@@ -77,6 +93,15 @@
 
             // 状態を localStorage に保存
             localStorage.setItem('currentStatus', status);
+        }
+
+        function setCustomStatus() {
+            const customStatus = document.getElementById('customStatusInput').value;
+            if (customStatus.trim() !== "") {
+                setStatus(customStatus);
+            } else {
+                alert("自由入力欄が空です。");
+            }
         }
     </script>
 </body>
