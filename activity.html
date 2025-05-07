@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動静 - サンガツユリ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .status {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .login {
+            margin: 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>現在の動静</h1>
+    <div class="status" id="currentStatus">OFF</div>
+
+    <div class="login">
+        <input type="password" id="adminPassword" placeholder="パスワードを入力">
+        <button onclick="login()">ログイン</button>
+    </div>
+
+    <div class="buttons hidden" id="statusButtons">
+        <button onclick="setStatus('睡眠中')">睡眠中</button>
+        <button onclick="setStatus('大学')">大学</button>
+        <button onclick="setStatus('勉強中')">勉強中</button>
+        <button onclick="setStatus('移動中')">移動中</button>
+        <button onclick="setStatus('OFF')">OFF</button>
+        <button onclick="setStatus('外出中')">外出中</button>
+    </div>
+
+    <script>
+        const correctPassword = "vmrwxigb8972";
+
+        function login() {
+            const passwordInput = document.getElementById('adminPassword').value;
+            if (passwordInput === correctPassword) {
+                document.getElementById('statusButtons').classList.remove('hidden');
+                alert("ログイン成功！");
+            } else {
+                alert("パスワードが間違っています。");
+            }
+        }
+
+        function setStatus(status) {
+            const statusElement = document.getElementById('currentStatus');
+            statusElement.textContent = status;
+        }
+    </script>
+</body>
+
+</html>
