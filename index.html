@@ -122,6 +122,26 @@
             document.getElementById('currentStatusDisplay').textContent = `現在の動静: ${savedStatus}`;
         };
     </script>
+
+    <script>
+        // ページ読み込み時にサーバーから動静を取得
+        window.onload = () => {
+            fetch('http://localhost:3000/getStatus')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('サーバーエラー');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('currentStatusDisplay').textContent = `現在の動静: ${data.status}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('サーバーとの通信に失敗しました。');
+                });
+        };
+    </script>
 </body>
 
 </html>

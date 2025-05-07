@@ -10,33 +10,57 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #444;
         }
 
         .status {
-            font-size: 1.5em;
+            font-size: 1.8em;
             margin: 20px 0;
+            color: #007BFF;
+            font-weight: bold;
         }
 
-        .buttons button {
+        .buttons button, .login button, .navigation button {
             padding: 10px 20px;
             margin: 5px;
             font-size: 1em;
             cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            transition: background-color 0.3s ease;
         }
 
-        .login {
-            margin: 20px 0;
+        .buttons button:hover, .login button:hover, .navigation button:hover {
+            background-color: #0056b3;
+        }
+
+        .login input, .custom-status input {
+            padding: 10px;
+            margin: 5px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
         }
 
         .hidden {
             display: none;
         }
 
-        .navigation button {
-            padding: 10px 20px;
+        .custom-status {
+            margin-top: 10px;
+        }
+
+        .navigation {
             margin-top: 20px;
-            font-size: 1em;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -113,7 +137,9 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('サーバーエラー');
+                    return response.text().then(text => {
+                        throw new Error(`サーバーエラー: ${text}`);
+                    });
                 }
                 return response.json();
             })
@@ -122,8 +148,8 @@
                 alert('動静が更新されました！');
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('サーバーとの通信に失敗しました。');
+                console.error('通信エラー:', error.message);
+                alert('サーバーとの通信に失敗しました。詳細はコンソールを確認してください。');
             });
         }
 
