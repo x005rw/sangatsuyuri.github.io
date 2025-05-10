@@ -34,24 +34,46 @@
             }
         }
 
-        function saveData() {
+        // サーバーから現在の動静を取得
+        async function fetchStatus() {
+            try {
+                const response = await fetch("http://localhost:3000/status");
+                const data = await response.json();
+                document.getElementById("current-status").textContent = `動静：${data.status}`;
+                document.getElementById("current-busy-level").textContent = `ひとこと：${data.comment}`;
+            } catch (error) {
+                console.error("データの取得に失敗しました:", error);
+            }
+        }
+
+        // サーバーに動静を保存
+        async function saveData() {
             if (isAuthenticated) {
                 const customStatus = document.getElementById("custom-status").value;
                 const comment = document.getElementById("busy-comment").value;
 
-                if (customStatus.trim() !== "") {
-                    document.getElementById("current-status").textContent = `動静：${customStatus}`;
+                try {
+                    const response = await fetch("http://localhost:3000/status", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            status: customStatus || "OFF",
+                            comment: comment || "未設定",
+                        }),
+                    });
+                    const result = await response.json();
+                    alert(result.message);
+                    fetchStatus(); // 更新後に再取得
+                } catch (error) {
+                    console.error("データの保存に失敗しました:", error);
                 }
-
-                if (comment.trim() !== "") {
-                    document.getElementById("current-busy-level").textContent = `ひとこと：${comment}`;
-                }
-
-                document.getElementById("admin-controls").style.display = "none"; // 管理者用コントロールを非表示
             } else {
                 alert("管理者ログインが必要です。");
             }
         }
+
+        // ページ読み込み時に現在の動静を取得
+        window.onload = fetchStatus;
     </script>
 </head>
 
