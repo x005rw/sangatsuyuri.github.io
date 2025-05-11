@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
   <div id="root"></div>
   <script type="text/babel">
@@ -17,13 +19,16 @@
     const App = () => {
       const [status, setStatus] = useState("未設定");
       const [oneWord, setOneWord] = useState("");
+      const [location, setLocation] = useState("未設定");
       const [isAdmin, setIsAdmin] = useState(false);
       const [password, setPassword] = useState("");
       const [error, setError] = useState("");
       const [customStatus, setCustomStatus] = useState("");
       const [oneWordInput, setOneWordInput] = useState("");
+      const [customLocation, setCustomLocation] = useState("");
 
       const statuses = ["未設定", "睡眠中", "入浴中", "移動中", "勉強中"];
+      const locations = ["自宅", "外出中"];
       const JSONBIN_API_KEY = "$2a$10$bEqn/AHi/5SY22I7fDM90OQeWK33Zl2YiJP4f.tOSmG3rVvoCrwSu";
       const JSONBIN_ID = "68204fab8960c979a5972d3e";
 
@@ -38,6 +43,7 @@
           .then((data) => {
             setStatus(data.record.status || "未設定");
             setOneWord(data.record.oneWord || "");
+            setLocation(data.record.location || "未設定");
           })
           .catch((err) => console.error("データ読み込みエラー:", err));
       }, []);
@@ -56,6 +62,7 @@
           const result = await response.json();
           setStatus(result.record.status);
           setOneWord(result.record.oneWord);
+          setLocation(result.record.location);
         } catch (err) {
           console.error("データ更新エラー:", err);
           setError("データ更新に失敗しました");
@@ -73,13 +80,13 @@
       };
 
       const handleStatusChange = (newStatus) => {
-        updateData({ status: newStatus, oneWord });
+        updateData({ status: newStatus, oneWord, location });
       };
 
       const handleCustomStatusSubmit = (e) => {
         e.preventDefault();
         if (customStatus.trim()) {
-          updateData({ status: customStatus, oneWord });
+          updateData({ status: customStatus, oneWord, location });
           setCustomStatus("");
         }
       };
@@ -87,8 +94,20 @@
       const handleOneWordSubmit = (e) => {
         e.preventDefault();
         if (oneWordInput.trim()) {
-          updateData({ status, oneWord: oneWordInput });
+          updateData({ status, oneWord: oneWordInput, location });
           setOneWordInput("");
+        }
+      };
+
+      const handleLocationChange = (newLocation) => {
+        updateData({ status, oneWord, location: newLocation });
+      };
+
+      const handleCustomLocationSubmit = (e) => {
+        e.preventDefault();
+        if (customLocation.trim()) {
+          updateData({ status, oneWord, location: customLocation });
+          setCustomLocation("");
         }
       };
 
@@ -100,9 +119,10 @@
       return (
         <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
           <h1 className="text-2xl font-bold text-center mb-4">サンガツユリの現在の状態</h1>
-          
+
           <div className="mb-6 text-center">
             <p className="text-lg">現在の状態: <span className="font-semibold">{status}</span></p>
+            <p className="text-lg mt-2">現在地: <span className="font-semibold">{location}</span></p>
             <p className="text-lg mt-2">ひとこと: <span className="font-semibold">{oneWord || "未設定"}</span></p>
           </div>
 
@@ -133,6 +153,35 @@
                   <button
                     type="submit"
                     className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                  >
+                    設定
+                  </button>
+                </form>
+              </div>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">現在地</h3>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  {locations.map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => handleLocationChange(loc)}
+                      className="bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600"
+                    >
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+                <form onSubmit={handleCustomLocationSubmit} className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={customLocation}
+                    onChange={(e) => setCustomLocation(e.target.value)}
+                    placeholder="カスタム現在地を入力"
+                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600"
                   >
                     設定
                   </button>
@@ -193,4 +242,5 @@
     ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 </body>
+
 </html>
