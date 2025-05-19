@@ -1,13 +1,21 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const session = require('express-session');
+const rateLimit = require('express-rate-limit');
+const csrf = require('csurf');
 const path = require('path');
+const DOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+
+// DOMPurifyのセットアップ
+const window = new JSDOM('').window;
+const clean = DOMPurify(window);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// SQLite in-memory DB
-const db = new sqlite3.Database(':memory:');
+// SQLite DB（ファイルベース）
+const db = new sqlite3.Database('./database.db');
 db.serialize(() => {
     db.run("CREATE TABLE IF NOT EXISTS status (id INTEGER PRIMARY KEY, current_status TEXT)");
     db.get("SELECT * FROM status WHERE id = 1", (err, row) => {
@@ -17,29 +25,50 @@ db.serialize(() => {
     });
 });
 
-// Session Middleware
+// Rate Limiter：ログイン試行制限
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15分
+    max: 5, // 最大5回まで
+    message: 'ログイン試行回数が上限に達しました'
+});
+
+// Session Middleware（セキュア設定）
 app.use(session({
-    secret: 'secret-key',
+    secret: process.env.SESSION_SECRET || 'strong-secret-key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // HTTPSのみ送信
+        sameSite: 'strict', // CSRF防止
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7日間
+    }
 }));
 
-// Static files（index.html）
+// CSRF Protection（POST保護）
+const csrfProtection = csrf({ cookie: false });
+
+// 静的ファイル配信
 app.use(express.static(path.join(__dirname, 'public')));
 
-// JSON & Form パーサー
+// リクエストパーサー
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ログイン処理
-app.post('/login', (req, res) => {
+// 管理者パスワード（環境変数 or デフォルト）
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'u6yn38hm';
+
+// ログイン処理（Rate Limit付き + サニタイズ）
+app.post('/login', loginLimiter, (req, res) => {
     const { password } = req.body;
-    if (password === 'ADMIN_PASSWORD') {
+    const safePassword = clean.sanitize(password);
+
+    if (safePassword === ADMIN_PASSWORD) {
         req.session.admin = true;
-        res.redirect('/');
-    } else {
-        res.status(401).send('パスワードが違います');
+        return res.redirect('/');
     }
+
+    res.status(401).send('パスワードが違います');
 });
 
 // ログアウト
@@ -48,21 +77,23 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-// ステータス取得
+// ステータス取得（CSRF保護なし）
 app.get('/api/status', (req, res) => {
     db.get("SELECT current_status FROM status WHERE id = 1", (err, row) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) return res.status(500).json({ error: 'ステータス取得中にエラーが発生しました' });
         res.json(row);
     });
 });
 
-// ステータス更新
-app.post('/api/status', (req, res) => {
+// ステータス更新（CSRF保護＋サニタイズ＋認証）
+app.post('/api/status', csrfProtection, (req, res) => {
     if (!req.session.admin) return res.status(403).send('アクセス拒否');
 
     const { status } = req.body;
-    db.run("UPDATE status SET current_status = ? WHERE id = 1", [status], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
+    const safeStatus = clean.sanitize(status);
+
+    db.run("UPDATE status SET current_status = ? WHERE id = 1", [safeStatus], function (err) {
+        if (err) return res.status(500).json({ error: 'ステータス更新中にエラーが発生しました' });
         res.json({ updated: true });
     });
 });
