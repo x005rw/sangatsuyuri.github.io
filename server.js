@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 // ログイン処理
 app.post('/login', (req, res) => {
     const { password } = req.body;
-    if (password === 'u6yn38hm') {
+    if (password === 'ADMIN_PASSWORD') {
         req.session.admin = true;
         res.redirect('/');
     } else {
