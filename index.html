@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>サンガツユリの現在の状態</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            color: #555;
+        }
+
+        p {
+            font-size: 1.5rem;
+        }
+
+        #time {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>サンガツユリの現在の状態</h1>
+    <p id="status">読み込み中...</p>
+    <p id="time"></p>
+
+    <script>
+        const BIN_ID = '682a9d198a456b7966a0ca55';
+        const ACCESS_KEY = '$2a$10$yr8RKRIZFCnTs/41Oi.WCO8VjpC28kVkT70MUYJXqpi1LKps9TiLq';
+
+        fetch(`https://api.jsonbin.io/v3/b/ ${BIN_ID}/latest`, {
+            method: 'GET',
+            headers: {
+                'X-Access-Key': ACCESS_KEY
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status').textContent = data.record.status;
+                document.getElementById('time').textContent = `最終更新: ${data.record.updated_at}`;
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('status').textContent = 'エラーが発生しました';
+            });
+    </script>
+</body>
+
+</html>
